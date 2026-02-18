@@ -16,6 +16,7 @@ export interface Flight {
   departureTime: string;
   arrivalTime: string;
   terminal: string;
+  seat?: string;
 }
 
 export interface ScheduleItem {
@@ -54,6 +55,16 @@ export interface Coupon {
   description: string;
   url: string;
   expiryDate?: string;
+}
+
+export interface ShoppingItem {
+  id: string;
+  name: string;
+  brand: string;
+  type: string;
+  photo?: string;
+  isBought: boolean;
+  note?: string;
 }
 
 export interface Accommodation {

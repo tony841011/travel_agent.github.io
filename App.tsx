@@ -10,13 +10,14 @@ import AccommodationPage from './components/AccommodationPage';
 import AccountingPage from './components/AccountingPage';
 import SyncPage from './components/SyncPage';
 import TransportPage from './components/TransportPage';
+import ShoppingPage from './components/ShoppingPage';
 
 const STORAGE_KEY = 'kansai_itinerary_v1';
 
 const App: React.FC = () => {
   const [itinerary, setItinerary] = useState<DayItinerary[]>([]);
   const [activeDay, setActiveDay] = useState(1);
-  const [view, setView] = useState<'itinerary' | 'checklist' | 'coupons' | 'accommodation' | 'accounting' | 'sync' | 'transport'>('itinerary');
+  const [view, setView] = useState<'itinerary' | 'checklist' | 'coupons' | 'accommodation' | 'accounting' | 'sync' | 'transport' | 'shopping'>('itinerary');
   
   const viewTitles = {
     itinerary: '每日行程計畫',
@@ -25,18 +26,16 @@ const App: React.FC = () => {
     checklist: '行李準備清單',
     coupons: '旅行優惠券',
     accommodation: '住宿詳細資訊',
-    sync: '資料同步中心'
+    sync: '資料同步中心',
+    shopping: '必買清單 & 伴手禮'
   };
 
   // Helper function to sort items by time
   const sortItems = (items: ScheduleItem[]) => {
     return [...items].sort((a, b) => {
-      // If both have no time, keep original relative order
       if (!a.time && !b.time) return 0;
-      // Items without time go to the bottom
       if (!a.time) return 1;
       if (!b.time) return -1;
-      // Compare time strings (e.g., "09:00" vs "14:30")
       return a.time.localeCompare(b.time);
     });
   };
@@ -62,7 +61,6 @@ const App: React.FC = () => {
     if (saved) {
       try {
         const parsed: DayItinerary[] = JSON.parse(saved);
-        // Ensure initial sort on load
         setItinerary(parsed.map(day => ({ ...day, items: sortItems(day.items) })));
       } catch (e) {
         setItinerary(INITIAL_ITINERARY.map(day => ({ ...day, items: sortItems(day.items) })));
@@ -147,7 +145,7 @@ const App: React.FC = () => {
         } else {
           updatedItems = [...day.items, newItem];
         }
-        return { ...day, items: sortItems(updatedItems) }; // Sort items after adding/editing
+        return { ...day, items: sortItems(updatedItems) };
       }
       return day;
     });
@@ -184,6 +182,7 @@ const App: React.FC = () => {
             {/* View Switcher */}
             <div className="bg-white/10 p-1 rounded-xl backdrop-blur-md flex flex-wrap justify-center gap-1 self-center md:self-end border border-white/10">
               <button onClick={() => setView('itinerary')} className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${view === 'itinerary' ? 'bg-white text-indigo-700 shadow-lg scale-105' : 'text-white hover:bg-white/10'}`}>行程</button>
+              <button onClick={() => setView('shopping')} className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${view === 'shopping' ? 'bg-white text-indigo-700 shadow-lg scale-105' : 'text-white hover:bg-white/10'}`}>採買</button>
               <button onClick={() => setView('transport')} className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${view === 'transport' ? 'bg-white text-indigo-700 shadow-lg scale-105' : 'text-white hover:bg-white/10'}`}>交通</button>
               <button onClick={() => setView('accounting')} className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${view === 'accounting' ? 'bg-white text-indigo-700 shadow-lg scale-105' : 'text-white hover:bg-white/10'}`}>記帳</button>
               <button onClick={() => setView('sync')} className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${view === 'sync' ? 'bg-white text-indigo-700 shadow-lg scale-105' : 'text-white hover:bg-white/10'}`}>同步</button>
@@ -193,32 +192,26 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* PAGE TITLE (ALIGNED) */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-in fade-in slide-in-from-left-4 duration-700">
             <h2 className="text-3xl md:text-4xl font-black text-white drop-shadow-sm tracking-tight">
               {viewTitles[view]}
             </h2>
             
-            {/* Contextual Action Buttons in Header */}
             {view === 'itinerary' && (
-               <button 
-                  onClick={handleOpenAddModal}
-                  className="bg-white text-indigo-700 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                  </svg>
+               <button onClick={handleOpenAddModal} className="bg-white text-indigo-700 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
                   新增行程項目
                 </button>
             )}
+            {view === 'shopping' && (
+              <button id="header-add-shopping-btn" className="bg-white text-indigo-700 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
+                新增採買項目
+              </button>
+            )}
             {view === 'coupons' && (
-              <button 
-                id="header-add-coupon-btn"
-                className="bg-white text-indigo-700 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                </svg>
+              <button id="header-add-coupon-btn" className="bg-white text-indigo-700 px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
                 新增優惠券
               </button>
             )}
@@ -226,47 +219,28 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="max-w-4xl w-full mx-auto px-4 -mt-10 relative z-20 pb-20">
         {view === 'itinerary' && (
           <>
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-2 mb-8 flex overflow-x-auto no-scrollbar gap-2 sticky top-4 z-30 border border-slate-100">
               {itinerary.map((day) => (
-                <button
-                  key={day.id}
-                  onClick={() => setActiveDay(day.id)}
-                  className={`flex-1 min-w-[80px] py-3 px-2 rounded-xl transition-all duration-200 text-center ${
-                    activeDay === day.id ? 'bg-indigo-600 text-white shadow-lg scale-105 font-bold' : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
+                <button key={day.id} onClick={() => setActiveDay(day.id)} className={`flex-1 min-w-[80px] py-3 px-2 rounded-xl transition-all duration-200 text-center ${activeDay === day.id ? 'bg-indigo-600 text-white shadow-lg scale-105 font-bold' : 'text-gray-500 hover:bg-gray-100'}`}>
                   <div className="text-[10px] uppercase tracking-widest opacity-80">Day {day.id}</div>
                   <div className="text-sm whitespace-nowrap">{day.date.split('/')[1]}/{day.date.split('/')[2]}</div>
                 </button>
               ))}
             </div>
-
             {currentDay && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-black text-slate-800">{currentDay.title}</h3>
-                  <p className="text-sm font-medium text-slate-500 mt-1">{currentDay.location} · {currentDay.hotel || '未設定住宿'}</p>
-                </div>
+                <div className="mb-6"><h3 className="text-2xl font-black text-slate-800">{currentDay.title}</h3><p className="text-sm font-medium text-slate-500 mt-1">{currentDay.location} · {currentDay.hotel || '未設定住宿'}</p></div>
                 <WeatherCard weather={currentDay.weather} location={currentDay.location} />
-                <div className="mt-8 space-y-0">
-                  {currentDay.items.map((item) => (
-                    <ScheduleCard 
-                      key={item.id} 
-                      item={item} 
-                      onEdit={handleOpenEditModal}
-                      onDelete={handleDeleteItem}
-                    />
-                  ))}
-                </div>
+                <div className="mt-8 space-y-0">{currentDay.items.map((item) => <ScheduleCard key={item.id} item={item} onEdit={handleOpenEditModal} onDelete={handleDeleteItem} />)}</div>
               </div>
             )}
           </>
         )}
         
+        {view === 'shopping' && <ShoppingPage />}
         {view === 'transport' && <TransportPage />}
         {view === 'checklist' && <ChecklistPage />}
         {view === 'coupons' && <CouponsPage />}
@@ -275,7 +249,6 @@ const App: React.FC = () => {
         {view === 'sync' && <SyncPage />}
       </main>
 
-      {/* Modal remains the same */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
@@ -286,14 +259,13 @@ const App: React.FC = () => {
               </button>
             </div>
             <form onSubmit={handleSaveItem} className="p-8 space-y-6 overflow-y-auto">
-              {/* Form content */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">標題 *</label>
                   <input type="text" value={formTitle} onChange={e => setFormTitle(e.target.value)} required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="景點或餐廳名稱" />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">時間 (24小時制，如 09:00)</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">時間 (24小時制)</label>
                   <input type="time" value={formTime} onChange={e => setFormTime(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
                 </div>
               </div>
@@ -319,7 +291,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="bg-slate-900 text-slate-400 py-12 px-6 mt-auto text-center">
         <div className="max-w-4xl mx-auto"><p className="text-sm font-medium italic">所有的美好旅程都值得被仔細記錄。</p></div>
       </footer>

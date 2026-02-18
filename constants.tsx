@@ -11,7 +11,8 @@ export const FLIGHTS: Flight[] = [
     to: 'KIX (關西 T2)',
     departureTime: '2026/02/27 10:30',
     arrivalTime: '2026/02/27 14:05',
-    terminal: 'KIX Terminal 2'
+    terminal: 'KIX Terminal 2',
+    seat: '尚未劃位'
   },
   {
     id: 'f2',
@@ -22,7 +23,8 @@ export const FLIGHTS: Flight[] = [
     to: 'TPE (桃園 T2)',
     departureTime: '2026/03/03 17:45',
     arrivalTime: '2026/03/03 19:55',
-    terminal: 'KIX Terminal 1'
+    terminal: 'KIX Terminal 1',
+    seat: '尚未劃位'
   }
 ];
 
@@ -88,12 +90,12 @@ export const ITINERARY: DayItinerary[] = [
         time: '09:00',
         title: '和服租借：璃光着物',
         duration: '1 小時',
-        transportAfter: { mode: 'Walk', detail: '前往八阪神社', duration: '15 分鐘' }
+        transportAfter: { mode: 'Walk', detail: '前往八飯店神社', duration: '15 分鐘' }
       },
       {
         id: '2-2',
         time: '10:30',
-        title: 'K.D 和服攝影 @ 八阪神社',
+        title: 'K.D 和服攝影 @ 八飯店神社',
         duration: '1.5 小時',
         description: '在神社內進行專業攝影。'
       },

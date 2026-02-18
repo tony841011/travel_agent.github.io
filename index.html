@@ -14,14 +14,23 @@
       font-family: 'Inter', 'Noto Sans TC', sans-serif;
       background-color: #f8fafc;
     }
+    /* 隱藏捲軸但保持功能 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.4",
+    "react-dom": "https://esm.sh/react-dom@^19.2.4",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.41.0"
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
@@ -29,6 +38,13 @@
 </head>
 <body>
   <div id="root"></div>
+  <!-- 
+    部署提示：
+    1. 在 GitHub Pages 環境中，瀏覽器無法直接執行 .tsx 檔案。
+    2. 建議使用 Vite (npm create vite@latest) 將此專案打包。
+    3. 打包後的 index.html 會自動將此處的 .tsx 替換為編譯後的 .js。
+  -->
+  <script type="module" src="./index.tsx"></script>
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
